@@ -2,7 +2,7 @@
 import serial,time #You need the pyserial library
 import struct
 
-ser = serial.Serial('/dev/ttyACM0', 230400, timeout=0)
+ser = serial.Serial('/dev/ttyUSB0', 185000, timeout=0)
 #time.sleep(10);#my arduino bugs if data is written to the port after opening it
 #filename='sonic.bin'#name of the rom, bin format
 #f=open(name,'rb');
@@ -16,6 +16,7 @@ while True:
     print("              1-dump                       ")
     print("              2-burn                       ")
     print("              3-erase                       ")
+    print("              4-check                       ")
     print("                              2016         ")
     print("                                  Robson C ")
     print("===========================================")
@@ -96,3 +97,17 @@ while True:
             response=ser.read(1)
             print("rsp", response)
         print("Chip erased\n")
+    if(option==4):
+        ser.flushInput()
+        ser.write(b"\x55")
+        ser.write(bytes("c","ASCII"))
+
+        response=bytes("N","ASCII")
+        while response!=bytes("Y","ASCII"):
+            print("Waiting for response\n")
+            while ser.inWaiting()==0:
+                time.sleep(0.1)
+                print("waiting for CHK response")
+            response=ser.read(1)
+            print("rsp", response)
+        print("Done\n")
